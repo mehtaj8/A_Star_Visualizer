@@ -79,8 +79,25 @@ function Spot(i, j) {
   };
 }
 
+var cnv;
+var x;
+var y;
+
+function centerCanvas() {
+  x = (windowWidth - width) / 2;
+  y = (windowHeight - height) / 2;
+  cnv.position(x, y);
+  button.position(x + width + 50, y + 10);
+}
+
+function windowResized() {
+  centerCanvas();
+}
+
 function setup() {
-  createCanvas(600, 600);
+  cnv = createCanvas(600, 600);
+  button = createButton("click me");
+  centerCanvas();
   console.log("A*");
 
   w = width / cols;
