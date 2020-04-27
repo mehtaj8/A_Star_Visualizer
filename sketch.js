@@ -7,7 +7,9 @@ function removeFromArray(arr, elm) {
 }
 
 function heuristic(a, b) {
-  var d = dist(a.i, a.j, b.i, b.j);
+  // var d = dist(a.i, a.j, b.i, b.j); --> Euclidean Distance
+  // Manhatten Distance
+  var d = abs(a.i - b.i) + abs(a.j - b.j);
   return d;
 }
 
@@ -20,7 +22,7 @@ var closedSet = [];
 var start;
 var end;
 var w, h;
-var path;
+var path = [];
 
 function Spot(i, j) {
   this.i = i;
@@ -101,14 +103,7 @@ function draw() {
     var current = openSet[lowestIndex];
 
     if (current == end) {
-      // Find the path
-      path = [];
-      var temp = current;
-      path.push(temp);
-      while (temp.previous) {
-        path.push(temp.previous);
-        temp = temp.previous;
-      }
+      noLoop();
       console.log("DONE!");
     }
 
@@ -155,5 +150,18 @@ function draw() {
 
   for (var i = 0; i < openSet.length; i++) {
     openSet[i].show(color(0, 255, 0));
+  }
+
+  // Find the path
+  path = [];
+  var temp = current;
+  path.push(temp);
+  while (temp.previous) {
+    path.push(temp.previous);
+    temp = temp.previous;
+  }
+
+  for (var i = 0; i < path.length; i++) {
+    path[i].show(color(0, 0, 255));
   }
 }
