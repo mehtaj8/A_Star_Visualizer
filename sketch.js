@@ -7,14 +7,15 @@ function removeFromArray(arr, elm) {
 }
 
 function heuristic(a, b) {
-  // var d = dist(a.i, a.j, b.i, b.j); --> Euclidean Distance
+  var d = dist(a.i, a.j, b.i, b.j); // --> Euclidean Distance
   // Manhatten Distance
-  var d = abs(a.i - b.i) + abs(a.j - b.j);
+  // var d = Math.sqrt(Math.pow(abs(a.i - b.i), 2) + Math.pow(abs(a.j - b.j), 2));
+  // var d = abs(a.i - b.i) + abs(a.j - b.j);
   return d;
 }
 
-var cols = 25;
-var rows = 25;
+var cols = 50;
+var rows = 50;
 var grid = new Array(cols);
 
 var openSet = [];
@@ -32,11 +33,20 @@ function Spot(i, j) {
   this.h = 0;
   this.neighbours = [];
   this.previous = undefined;
+  this.wall = false;
+
+  if (random(1) < 0.3) {
+    this.wall = true;
+  }
 
   this.show = function (colour) {
-    fill(colour);
-    stroke(0);
-    rect(this.i * w, this.j * h, w, h);
+    //fill(colour);
+    if (this.wall) {
+      fill(0);
+      stroke(0);
+      ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
+    }
+    //rect(this.i * w, this.j * h, w, h);
   };
 
   this.addNeighbours = function (grid) {
@@ -54,11 +64,23 @@ function Spot(i, j) {
     if (j > 0) {
       this.neighbours.push(grid[i][j - 1]);
     }
+    if (i > 0 && j > 0) {
+      this.neighbours.push(grid[i - 1][j - 1]);
+    }
+    if (i < cols - 1 && j > 0) {
+      this.neighbours.push(grid[i + 1][j - 1]);
+    }
+    if (i > 0 && j < rows - 1) {
+      this.neighbours.push(grid[i - 1][j + 1]);
+    }
+    if (i < cols - 1 && j < rows - 1) {
+      this.neighbours.push(grid[i + 1][j + 1]);
+    }
   };
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(600, 600);
   console.log("A*");
 
   w = width / cols;
@@ -83,8 +105,11 @@ function setup() {
     }
   }
 
+  // SET START AND END
   start = grid[0][0];
   end = grid[cols - 1][rows - 1];
+  start.wall = false;
+  end.wall = false;
 
   openSet.push(start);
 
@@ -114,29 +139,37 @@ function draw() {
     for (var i = 0; i < neighbours.length; i++) {
       var neighbour = neighbours[i];
 
-      if (!closedSet.includes(neighbour)) {
+      if (!closedSet.includes(neighbour) && !neighbour.wall) {
         var tempG = current.g + 1;
 
+        var newPath = false;
         if (openSet.includes(neighbour)) {
           if (tempG < neighbour.g) {
             neighbour.g = tempG;
+            newPath = true;
           }
         } else {
           neighbour.g = tempG;
+          newPath = true;
           openSet.push(neighbour);
         }
 
         // Heuristic Calculation
-        neighbour.h = heuristic(neighbour, end);
-        neighbour.f = neighbour.g + neighbour.h;
-        neighbour.previous = current;
+        if (newPath) {
+          neighbour.h = heuristic(neighbour, end);
+          neighbour.f = neighbour.g + neighbour.h;
+          neighbour.previous = current;
+        }
       }
     }
   } else {
-    // No Solution
+    //No Solution
+    console.log("No Solution");
+    noLoop();
+    return;
   }
 
-  background(0);
+  background(255);
 
   for (var i = 0; i < cols; i++) {
     for (var j = 0; j < rows; j++) {
@@ -162,6 +195,15 @@ function draw() {
   }
 
   for (var i = 0; i < path.length; i++) {
-    path[i].show(color(0, 0, 255));
+    //path[i].show(color(0, 0, 255));
   }
+
+  noFill();
+  stroke(0, 0, 255);
+  strokeWeight(w / 2);
+  beginShape();
+  for (var i = 0; i < path.length; i++) {
+    curveVertex(path[i].i * w + w / 2, path[i].j * h + h / 2);
+  }
+  endShape();
 }
