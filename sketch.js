@@ -143,8 +143,9 @@ function centerCanvas() {
   select("#diag").position(x + width + 120, y + 205 + offset);
   select("#conditional").position(x + width + 40, y + 300 + offset);
   select("#final").position(x + width + 40, y + 330 + offset);
-  select("#fullLegend").position(width - 400, y + 150);
-  select("#legend").position(width - 450, y + 90);
+  select("#fullLegend").position(x - 300, y + 150);
+  select("#legend").position(x - 350, y + 90);
+  select("#title").position(x + 75, y - 100);
 }
 
 function windowResized() {
