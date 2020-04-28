@@ -107,6 +107,7 @@ function centerCanvas() {
   cnv.position(x, y);
   offset = 30;
   button.position(x + width + 40, y + 120 + offset);
+  button1.position(x + width + 40, y + 240 + offset);
   select("#inputStartx").position(x + width + 40, y + 10 + offset);
   select("#inputStarty").position(x + width + 150, y + 10 + offset);
   select("#inputEndx").position(x + width + 40, y + 80 + offset);
@@ -128,10 +129,32 @@ function diag() {
 
 function run() {
   // SET START AND END
-  if (select("#inputStartx").value() == undefined) {
+  if (
+    select("#inputStartx").value().length == 0 ||
+    select("#inputStarty").value().length == 0 ||
+    typeof select("#inputStartx").value() == "string" ||
+    typeof select("#inputStarty").value() == "string"
+  ) {
+    start = grid[0][0];
+  } else {
+    start =
+      grid[abs(49 - select("#inputStartx").value())][
+        abs(49 - select("#inputStarty").value())
+      ];
   }
-  start = grid[select("#inputStartx").value()][select("#inputStarty").value()];
-  end = grid[select("#inputEndx").value()][select("#inputEndy").value()];
+  if (
+    select("#inputEndx").value().length == 0 ||
+    select("#inputEndy").value().length == 0 ||
+    typeof select("#inputEndx").value() == "string" ||
+    typeof select("#inputEndy").value() == "string"
+  ) {
+    end = grid[cols - 1][rows - 1];
+  } else {
+    end =
+      grid[abs(49 - select("#inputEndx").value())][
+        abs(49 - select("#inputEndy").value())
+      ];
+  }
   start.wall = false;
   end.wall = false;
   start.start = true;
@@ -154,6 +177,8 @@ function setup() {
   cnv = createCanvas(700, 700);
   button = createButton("Play Animation");
   button.mousePressed(run);
+  button1 = createButton("Reset");
+  button1.mousePressed(setup);
   select("#inputStartx").style("width", "70px");
   select("#inputStartx").style("height", "23px");
   select("#inputStarty").style("width", "70px");
