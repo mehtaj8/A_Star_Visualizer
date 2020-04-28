@@ -141,6 +141,16 @@ function run() {
 }
 
 function setup() {
+  cols = 50;
+  rows = 50;
+  grid = new Array(cols);
+
+  openSet = [];
+  closedSet = [];
+  path = [];
+  runCond = false;
+  diagCond = false;
+
   cnv = createCanvas(700, 700);
   button = createButton("Play Animation");
   button.mousePressed(run);
