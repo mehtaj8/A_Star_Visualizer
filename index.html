@@ -1,11 +1,24 @@
 <html>
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
-    <script
-      language="javascript"
-      type="text/javascript"
-      src="sketch.js"
-    ></script>
+    <div id="main">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
+      <script
+        language="javascript"
+        type="text/javascript"
+        src="sketch.js"
+      ></script>
+      <link rel="stylesheet" href="style.css" />
+      <label class="toggle" id="toggle">
+        <input type="checkbox" />
+        <span class="slider" onclick="diag()"></span>
+      </label>
+      <p id="start">Enter Starting x and y Coordinates (0 - 50)</p>
+      <p1 id="end">Enter Ending x and y Coordinates (0 - 50)</p1>
+      <input id="inputStartx" placeholder="X" />
+      <input id="inputStarty" placeholder="Y" />
+      <input id="inputEndx" placeholder="X" />
+      <input id="inputEndy" placeholder="Y" />
+    </div>
   </head>
   <body></body>
 </html>

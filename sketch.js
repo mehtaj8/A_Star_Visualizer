@@ -24,6 +24,8 @@ var start;
 var end;
 var w, h;
 var path = [];
+var runCond = false;
+var diagCond = false;
 
 function Spot(i, j) {
   this.i = i;
@@ -34,18 +36,32 @@ function Spot(i, j) {
   this.neighbours = [];
   this.previous = undefined;
   this.wall = false;
+  this.start = false;
+  this.end = false;
 
   if (random(1) < 0.3) {
     this.wall = true;
   }
 
-  this.show = function (colour) {
+  this.show = function () {
     //fill(colour);
     if (this.wall) {
       fill(0);
-      stroke(0);
+      noStroke(0);
       ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
     }
+    if (this.start) {
+      fill(0, 255, 0);
+      noStroke(0);
+      ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
+    }
+
+    if (this.end) {
+      fill(255, 0, 0);
+      noStroke();
+      ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
+    }
+
     //rect(this.i * w, this.j * h, w, h);
   };
 
@@ -64,17 +80,19 @@ function Spot(i, j) {
     if (j > 0) {
       this.neighbours.push(grid[i][j - 1]);
     }
-    if (i > 0 && j > 0) {
-      this.neighbours.push(grid[i - 1][j - 1]);
-    }
-    if (i < cols - 1 && j > 0) {
-      this.neighbours.push(grid[i + 1][j - 1]);
-    }
-    if (i > 0 && j < rows - 1) {
-      this.neighbours.push(grid[i - 1][j + 1]);
-    }
-    if (i < cols - 1 && j < rows - 1) {
-      this.neighbours.push(grid[i + 1][j + 1]);
+    if (diagCond) {
+      if (i > 0 && j > 0) {
+        this.neighbours.push(grid[i - 1][j - 1]);
+      }
+      if (i < cols - 1 && j > 0) {
+        this.neighbours.push(grid[i + 1][j - 1]);
+      }
+      if (i > 0 && j < rows - 1) {
+        this.neighbours.push(grid[i - 1][j + 1]);
+      }
+      if (i < cols - 1 && j < rows - 1) {
+        this.neighbours.push(grid[i + 1][j + 1]);
+      }
     }
   };
 }
@@ -87,16 +105,52 @@ function centerCanvas() {
   x = (windowWidth - width) / 2;
   y = (windowHeight - height) / 2;
   cnv.position(x, y);
-  button.position(x + width + 50, y + 10);
+  offset = 30;
+  button.position(x + width + 40, y + 120 + offset);
+  select("#inputStartx").position(x + width + 40, y + 10 + offset);
+  select("#inputStarty").position(x + width + 150, y + 10 + offset);
+  select("#inputEndx").position(x + width + 40, y + 80 + offset);
+  select("#inputEndy").position(x + width + 150, y + 80 + offset);
+  select("#toggle").position(x + width + 40, y + 200 + offset);
+  select("#start").position(x + width + 40, y);
+  select("#end").position(x + width + 40, y + 50 + offset);
 }
 
 function windowResized() {
   centerCanvas();
 }
 
+function diag() {
+  diagCond = !diagCond;
+  console.log(diagCond);
+}
+
+function run() {
+  // SET START AND END
+  if (select("#inputStartx").value() == undefined) {
+  }
+  start = grid[select("#inputStartx").value()][select("#inputStarty").value()];
+  end = grid[select("#inputEndx").value()][select("#inputEndy").value()];
+  start.wall = false;
+  end.wall = false;
+  start.start = true;
+  end.end = true;
+  openSet.push(start);
+  runCond = !runCond;
+}
+
 function setup() {
-  cnv = createCanvas(600, 600);
-  button = createButton("click me");
+  cnv = createCanvas(700, 700);
+  button = createButton("Play Animation");
+  button.mousePressed(run);
+  select("#inputStartx").style("width", "70px");
+  select("#inputStartx").style("height", "23px");
+  select("#inputStarty").style("width", "70px");
+  select("#inputStarty").style("height", "23px");
+  select("#inputEndx").style("width", "70px");
+  select("#inputEndx").style("height", "23px");
+  select("#inputEndy").style("width", "70px");
+  select("#inputEndy").style("height", "23px");
   centerCanvas();
   console.log("A*");
 
@@ -115,77 +169,10 @@ function setup() {
     }
   }
 
-  //Adding Neighbours
-  for (var i = 0; i < cols; i++) {
-    for (var j = 0; j < rows; j++) {
-      grid[i][j].addNeighbours(grid);
-    }
-  }
-
-  // SET START AND END
-  start = grid[0][0];
-  end = grid[cols - 1][rows - 1];
-  start.wall = false;
-  end.wall = false;
-
-  openSet.push(start);
-
   console.log(grid);
 }
 
 function draw() {
-  if (openSet.length > 0) {
-    // Keep Going
-    var lowestIndex = 0;
-    for (var i = 0; i < openSet.length; i++) {
-      if (openSet[i].f < openSet[lowestIndex].f) {
-        lowestIndex = i;
-      }
-    }
-    var current = openSet[lowestIndex];
-
-    if (current == end) {
-      noLoop();
-      console.log("DONE!");
-    }
-
-    removeFromArray(openSet, current);
-    closedSet.push(current);
-
-    var neighbours = current.neighbours;
-    for (var i = 0; i < neighbours.length; i++) {
-      var neighbour = neighbours[i];
-
-      if (!closedSet.includes(neighbour) && !neighbour.wall) {
-        var tempG = current.g + 1;
-
-        var newPath = false;
-        if (openSet.includes(neighbour)) {
-          if (tempG < neighbour.g) {
-            neighbour.g = tempG;
-            newPath = true;
-          }
-        } else {
-          neighbour.g = tempG;
-          newPath = true;
-          openSet.push(neighbour);
-        }
-
-        // Heuristic Calculation
-        if (newPath) {
-          neighbour.h = heuristic(neighbour, end);
-          neighbour.f = neighbour.g + neighbour.h;
-          neighbour.previous = current;
-        }
-      }
-    }
-  } else {
-    //No Solution
-    console.log("No Solution");
-    noLoop();
-    return;
-  }
-
   background(255);
 
   for (var i = 0; i < cols; i++) {
@@ -193,28 +180,85 @@ function draw() {
       grid[i][j].show(color(255));
     }
   }
+  if (runCond) {
+    //Adding Neighbours
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < rows; j++) {
+        grid[i][j].addNeighbours(grid);
+      }
+    }
 
-  for (var i = 0; i < closedSet.length; i++) {
-    closedSet[i].show(color(255, 0, 0));
+    if (openSet.length > 0) {
+      // Keep Going
+      var lowestIndex = 0;
+      for (var i = 0; i < openSet.length; i++) {
+        if (openSet[i].f < openSet[lowestIndex].f) {
+          lowestIndex = i;
+        }
+      }
+      var current = openSet[lowestIndex];
+
+      if (current == end) {
+        noLoop();
+        console.log("DONE!");
+      }
+
+      removeFromArray(openSet, current);
+      closedSet.push(current);
+
+      var neighbours = current.neighbours;
+      for (var i = 0; i < neighbours.length; i++) {
+        var neighbour = neighbours[i];
+
+        if (!closedSet.includes(neighbour) && !neighbour.wall) {
+          var tempG = current.g + 1;
+
+          var newPath = false;
+          if (openSet.includes(neighbour)) {
+            if (tempG < neighbour.g) {
+              neighbour.g = tempG;
+              newPath = true;
+            }
+          } else {
+            neighbour.g = tempG;
+            newPath = true;
+            openSet.push(neighbour);
+          }
+
+          // Heuristic Calculation
+          if (newPath) {
+            neighbour.h = heuristic(neighbour, end);
+            neighbour.f = neighbour.g + neighbour.h;
+            neighbour.previous = current;
+          }
+        }
+      }
+    } else {
+      //No Solution
+      console.log("No Solution");
+      noLoop();
+      return;
+    }
+
+    for (var i = 0; i < closedSet.length; i++) {
+      closedSet[i].show(color(255, 0, 0));
+    }
+
+    for (var i = 0; i < openSet.length; i++) {
+      openSet[i].show(color(0, 255, 0));
+    }
+
+    frameRate(25);
+    // Find the path
+    path = [];
+    var temp = current;
+    path.push(temp);
+    while (temp.previous) {
+      path.push(temp.previous);
+      temp = temp.previous;
+    }
   }
-
-  for (var i = 0; i < openSet.length; i++) {
-    openSet[i].show(color(0, 255, 0));
-  }
-
-  // Find the path
-  path = [];
-  var temp = current;
-  path.push(temp);
-  while (temp.previous) {
-    path.push(temp.previous);
-    temp = temp.previous;
-  }
-
-  for (var i = 0; i < path.length; i++) {
-    //path[i].show(color(0, 0, 255));
-  }
-
+  //Line Creation
   noFill();
   stroke(0, 0, 255);
   strokeWeight(w / 2);
