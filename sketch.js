@@ -14,6 +14,30 @@ function heuristic(a, b) {
   return d;
 }
 
+function resetSketch() {
+  document.getElementById("conditional").innerHTML = "Waiting...";
+  cols = 50;
+  rows = 50;
+  grid = new Array(cols);
+
+  openSet = [];
+  closedSet = [];
+  path = [];
+  runCond = false;
+
+  // Create the array
+  for (var i = 0; i < cols; i++) {
+    grid[i] = new Array(rows);
+  }
+
+  //Initialize Spots
+  for (var i = 0; i < cols; i++) {
+    for (var j = 0; j < rows; j++) {
+      grid[i][j] = new Spot(i, j);
+    }
+  }
+}
+
 var cols = 50;
 var rows = 50;
 var grid = new Array(cols);
@@ -39,7 +63,8 @@ function Spot(i, j) {
   this.start = false;
   this.end = false;
 
-  if (random(1) < 0.3) {
+  // SETTING NUMBER OF WALLS
+  if (random(1) < 0.25) {
     this.wall = true;
   }
 
@@ -107,7 +132,7 @@ function centerCanvas() {
   cnv.position(x, y);
   offset = 30;
   button.position(x + width + 40, y + 120 + offset);
-  button1.position(x + width + 40, y + 240 + offset);
+  button1.position(x + width + 40, y + 245 + offset);
   select("#inputStartx").position(x + width + 40, y + 10 + offset);
   select("#inputStarty").position(x + width + 150, y + 10 + offset);
   select("#inputEndx").position(x + width + 40, y + 80 + offset);
@@ -116,6 +141,10 @@ function centerCanvas() {
   select("#start").position(x + width + 40, y);
   select("#end").position(x + width + 40, y + 50 + offset);
   select("#diag").position(x + width + 120, y + 205 + offset);
+  select("#conditional").position(x + width + 40, y + 300 + offset);
+  select("#final").position(x + width + 40, y + 330 + offset);
+  select("#fullLegend").position(width - 400, y + 150);
+  select("#legend").position(width - 450, y + 90);
 }
 
 function windowResized() {
@@ -128,30 +157,27 @@ function diag() {
 }
 
 function run() {
+  document.getElementById("conditional").innerHTML = "Running...";
   // SET START AND END
   if (
     select("#inputStartx").value().length == 0 ||
-    select("#inputStarty").value().length == 0 ||
-    typeof select("#inputStartx").value() == "string" ||
-    typeof select("#inputStarty").value() == "string"
+    select("#inputStarty").value().length == 0
   ) {
-    start = grid[0][0];
+    start = grid[0][49];
   } else {
     start =
-      grid[abs(49 - select("#inputStartx").value())][
+      grid[abs(0 - select("#inputStartx").value())][
         abs(49 - select("#inputStarty").value())
       ];
   }
   if (
     select("#inputEndx").value().length == 0 ||
-    select("#inputEndy").value().length == 0 ||
-    typeof select("#inputEndx").value() == "string" ||
-    typeof select("#inputEndy").value() == "string"
+    select("#inputEndy").value().length == 0
   ) {
-    end = grid[cols - 1][rows - 1];
+    end = grid[49][0];
   } else {
     end =
-      grid[abs(49 - select("#inputEndx").value())][
+      grid[abs(0 - select("#inputEndx").value())][
         abs(49 - select("#inputEndy").value())
       ];
   }
@@ -164,28 +190,18 @@ function run() {
 }
 
 function setup() {
-  cols = 50;
-  rows = 50;
-  grid = new Array(cols);
-
-  openSet = [];
-  closedSet = [];
-  path = [];
-  runCond = false;
-  diagCond = false;
-
   cnv = createCanvas(700, 700);
   button = createButton("Play Animation");
   button.mousePressed(run);
-  button1 = createButton("Reset");
-  button1.mousePressed(setup);
-  select("#inputStartx").style("width", "70px");
+  button1 = createButton("Reset While Animation is Running");
+  button1.mousePressed(resetSketch);
+  select("#inputStartx").style("width", "100px");
   select("#inputStartx").style("height", "23px");
-  select("#inputStarty").style("width", "70px");
+  select("#inputStarty").style("width", "100px");
   select("#inputStarty").style("height", "23px");
-  select("#inputEndx").style("width", "70px");
+  select("#inputEndx").style("width", "100px");
   select("#inputEndx").style("height", "23px");
-  select("#inputEndy").style("width", "70px");
+  select("#inputEndy").style("width", "100px");
   select("#inputEndy").style("height", "23px");
   centerCanvas();
   console.log("A*");
@@ -193,17 +209,7 @@ function setup() {
   w = width / cols;
   h = height / rows;
 
-  // Create the array
-  for (var i = 0; i < cols; i++) {
-    grid[i] = new Array(rows);
-  }
-
-  //Initialize Spots
-  for (var i = 0; i < cols; i++) {
-    for (var j = 0; j < rows; j++) {
-      grid[i][j] = new Spot(i, j);
-    }
-  }
+  resetSketch();
 
   console.log(grid);
 }
@@ -236,6 +242,8 @@ function draw() {
 
       if (current == end) {
         noLoop();
+        document.getElementById("conditional").innerHTML = "DONE!";
+        document.getElementById("final").innerHTML = "Press F5 to Refresh Page";
         console.log("DONE!");
       }
 
@@ -271,6 +279,8 @@ function draw() {
       }
     } else {
       //No Solution
+      document.getElementById("conditional").innerHTML = "No Solution :(";
+      document.getElementById("final").innerHTML = "Press F5 to Refresh Page";
       console.log("No Solution");
       noLoop();
       return;
@@ -284,7 +294,11 @@ function draw() {
       openSet[i].show(color(0, 255, 0));
     }
 
-    frameRate(25);
+    if (diagCond == true) {
+      frameRate(25);
+    } else {
+      frameRate(100);
+    }
     // Find the path
     path = [];
     var temp = current;

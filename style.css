@@ -81,3 +81,16 @@ input:checked + .slider:before {
 #title {
   text-align: center;
 }
+
+#conditional {
+  color: red;
+}
+
+.Legend {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.iconSize1 {
+  width: 30px;
+  height: 15px;
+}

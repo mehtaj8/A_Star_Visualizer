@@ -15,11 +15,27 @@
       <p id="start">Enter Starting x and y Coordinates (0 - 49)</p>
       <p1 id="end">Enter Ending x and y Coordinates (0 - 49)</p1>
       <p2 id="diag">Diagonal Movements</p2>
-      <input id="inputStartx" placeholder="X" />
-      <input id="inputStarty" placeholder="Y" />
-      <input id="inputEndx" placeholder="X" />
-      <input id="inputEndy" placeholder="Y" />
+      <input id="inputStartx" placeholder="X (Default = 0)" />
+      <input id="inputStarty" placeholder="Y (Default = 0)" />
+      <input id="inputEndx" placeholder="X (Default = 49)" />
+      <input id="inputEndy" placeholder="Y (Default = 49)" />
       <h1 id="title">Welcome to the A* Pathfinding Visualizer</h1>
+      <h2 id="conditional">Waiting...</h2>
+      <h3 id="final"></h3>
+      <h1 id="legend">Legend:</h2>
+      <p id="fullLegend" class="Legend">
+        <img alt="start" class="iconSize" src="./images/start.png"></img>
+        --> Start State
+        <br></br>
+        <img alt="final" class="iconSize" src="./images/final.png"></img>
+      --> Final State
+      <br></br>
+        <img alt="wall" class="iconSize" src="./images/wall.png"></img>
+      --> Wall
+      <br></br>
+        <img alt="path" class="iconSize1" src="./images/path.png"></img>
+      --> Path
+      </p>
     </div>
   </head>
   <body></body>
