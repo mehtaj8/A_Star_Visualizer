@@ -15,6 +15,7 @@ function heuristic(a, b) {
 }
 
 function resetSketch() {
+  loop();
   document.getElementById("conditional").innerHTML = "Waiting...";
   cols = 50;
   rows = 50;
@@ -143,8 +144,8 @@ function centerCanvas() {
   select("#diag").position(x + width + 120, y + 205 + offset);
   select("#conditional").position(x + width + 40, y + 300 + offset);
   select("#final").position(x + width + 40, y + 330 + offset);
-  select("#fullLegend").position(x - 300, y + 150);
-  select("#legend").position(x - 350, y + 90);
+  select("#fullLegend").position(x - 280, y + 150);
+  select("#legend").position(x - 320, y + 90);
   select("#title").position(x + 75, y - 100);
 }
 
@@ -159,6 +160,7 @@ function diag() {
 
 function run() {
   document.getElementById("conditional").innerHTML = "Running...";
+  document.getElementById("final").innerHTML = "";
   // SET START AND END
   if (
     select("#inputStartx").value().length == 0 ||
@@ -194,7 +196,7 @@ function setup() {
   cnv = createCanvas(700, 700);
   button = createButton("Play/Pause Animation");
   button.mousePressed(run);
-  button1 = createButton("Reset While Animation is Running");
+  button1 = createButton("Reset");
   button1.mousePressed(resetSketch);
   select("#inputStartx").style("width", "100px");
   select("#inputStartx").style("height", "23px");
@@ -244,7 +246,6 @@ function draw() {
       if (current == end) {
         noLoop();
         document.getElementById("conditional").innerHTML = "DONE!";
-        document.getElementById("final").innerHTML = "Press F5 to Refresh Page";
         console.log("DONE!");
       }
 
@@ -280,10 +281,11 @@ function draw() {
       }
     } else {
       //No Solution
-      document.getElementById("conditional").innerHTML = "No Solution :(";
-      document.getElementById("final").innerHTML = "Press F5 to Refresh Page";
+      document.getElementById("final").innerHTML =
+        "No Solution, Generated New Maze.";
       console.log("No Solution");
       noLoop();
+      resetSketch();
       return;
     }
 
