@@ -192,7 +192,7 @@ function run() {
 
 function setup() {
   cnv = createCanvas(700, 700);
-  button = createButton("Play Animation");
+  button = createButton("Play/Pause Animation");
   button.mousePressed(run);
   button1 = createButton("Reset While Animation is Running");
   button1.mousePressed(resetSketch);
