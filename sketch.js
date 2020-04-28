@@ -114,6 +114,7 @@ function centerCanvas() {
   select("#toggle").position(x + width + 40, y + 200 + offset);
   select("#start").position(x + width + 40, y);
   select("#end").position(x + width + 40, y + 50 + offset);
+  select("#diag").position(x + width + 120, y + 205 + offset);
 }
 
 function windowResized() {
