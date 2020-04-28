@@ -159,37 +159,39 @@ function diag() {
 }
 
 function run() {
-  document.getElementById("conditional").innerHTML = "Running...";
-  document.getElementById("final").innerHTML = "";
-  // SET START AND END
-  if (
-    select("#inputStartx").value().length == 0 ||
-    select("#inputStarty").value().length == 0
-  ) {
-    start = grid[0][49];
-  } else {
-    start =
-      grid[abs(0 - select("#inputStartx").value())][
-        abs(49 - select("#inputStarty").value())
-      ];
+  if (!runCond) {
+    document.getElementById("conditional").innerHTML = "Running...";
+    document.getElementById("final").innerHTML = "";
+    // SET START AND END
+    if (
+      select("#inputStartx").value().length == 0 ||
+      select("#inputStarty").value().length == 0
+    ) {
+      start = grid[0][49];
+    } else {
+      start =
+        grid[abs(0 - select("#inputStartx").value())][
+          abs(49 - select("#inputStarty").value())
+        ];
+    }
+    if (
+      select("#inputEndx").value().length == 0 ||
+      select("#inputEndy").value().length == 0
+    ) {
+      end = grid[49][0];
+    } else {
+      end =
+        grid[abs(0 - select("#inputEndx").value())][
+          abs(49 - select("#inputEndy").value())
+        ];
+    }
+    start.wall = false;
+    end.wall = false;
+    start.start = true;
+    end.end = true;
+    openSet.push(start);
+    runCond = !runCond;
   }
-  if (
-    select("#inputEndx").value().length == 0 ||
-    select("#inputEndy").value().length == 0
-  ) {
-    end = grid[49][0];
-  } else {
-    end =
-      grid[abs(0 - select("#inputEndx").value())][
-        abs(49 - select("#inputEndy").value())
-      ];
-  }
-  start.wall = false;
-  end.wall = false;
-  start.start = true;
-  end.end = true;
-  openSet.push(start);
-  runCond = !runCond;
 }
 
 function setup() {
@@ -300,7 +302,6 @@ function draw() {
     if (diagCond == true) {
       frameRate(25);
     } else {
-      frameRate(100);
     }
     // Find the path
     path = [];
@@ -310,14 +311,14 @@ function draw() {
       path.push(temp.previous);
       temp = temp.previous;
     }
+    //Line Creation
+    noFill();
+    stroke(0, 0, 255);
+    strokeWeight(w / 2);
+    beginShape();
+    for (var i = 0; i < path.length; i++) {
+      curveVertex(path[i].i * w + w / 2, path[i].j * h + h / 2);
+    }
+    endShape();
   }
-  //Line Creation
-  noFill();
-  stroke(0, 0, 255);
-  strokeWeight(w / 2);
-  beginShape();
-  for (var i = 0; i < path.length; i++) {
-    curveVertex(path[i].i * w + w / 2, path[i].j * h + h / 2);
-  }
-  endShape();
 }
